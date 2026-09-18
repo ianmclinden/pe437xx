@@ -1,0 +1,38 @@
+[package]
+name = "pe437xx"
+version = "0.1.0"
+edition = "2021"
+authors = ["Ian McLinden <mclinden.ian@gmail.com>"]
+description = "Drivers for the PE437xx family RF Digital Step Attenuators by Peregrine Semiconductor.\nCompatible with the PE43701, PE43702, PE43703, PE43704, PE43705, PE43711, PE43712, and PE43713."
+readme = "README.md"
+keywords = ["pe437xx", "dsa", "embedded-hal-driver", "rf"]
+categories = ["embedded", "hardware-support", "no-std"]
+repository = "https://github.com/ianmclinden/pe437xx"
+documentation = "https://docs.rs/pe437xx"
+license = "MIT OR Apache-2.0"
+
+[workspace]
+resolver = "2"
+members = ["examples/spi"]
+
+[features]
+default = []
+# Enable defmt logging
+defmt = ["dep:defmt"]
+# Enable serde serialize+deserialize for crate types
+serde = ["dep:serde"]
+# Enable unchecked creation of crate types
+unchecked = []
+
+[dependencies]
+defmt = { version = "1.1.1", optional = true }
+embedded-hal = "1.0.0"
+serde = { version = "1.0.229", default-features = false, features = [
+    "derive",
+], optional = true }
+thiserror = { version = "2.0.20", default-features = false }
+
+[dev-dependencies]
+
+[profile.release]
+lto = true
