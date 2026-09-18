@@ -3,6 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/pe437xx.svg)](https://crates.io/crates/pe437xx)
 [![Documentation](https://docs.rs/pe437xx/badge.svg)](https://docs.rs/pe437xx)
 ![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.82+-blue.svg)
+[![CI Status](https://github.com/ianmclinden/pe437xx/workflows/CI/badge.svg)](https://github.com/ianmclinden/pe437xx/actions?query=workflow%3ACI)
 
 A `no_std` platform-agnostic driver for the PE437xx family RF Digital Step Attenuators by Peregrine Semiconductor, built on the [`embedded-hal`] 1.0 traits.
 
