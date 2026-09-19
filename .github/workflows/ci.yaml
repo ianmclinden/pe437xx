@@ -41,3 +41,35 @@ jobs:
 
       - name: Build
         run: cargo build --all-features --release
+
+  examples:
+    needs: [build]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - example: examples/spi
+            target: thumbv7m-none-eabi
+          - example: examples/spi-async
+            target: thumbv7m-none-eabi
+    name: Example (${{ matrix.example }})
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          target: ${{ matrix.target }}
+          components: clippy
+
+      - name: Lint
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Test
+        run: cargo test --verbose --all-features
+
+      - name: Build
+        working-directory: ${{ matrix.example }}
+        run: cargo build --release
