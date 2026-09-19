@@ -32,7 +32,7 @@ pub const MODE_0: Mode = Mode {
 
 const PE_ADDR: Address = match Address::new(0x00) {
     Ok(addr) => addr,
-    Err(e) => panic!("{e}"),
+    Err(_) => panic!("Invalid address"),
 };
 
 #[entry]
