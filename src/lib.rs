@@ -29,6 +29,12 @@
 
 mod error;
 pub use error::Error;
-pub mod spi;
 mod types;
 pub use types::{Address, Attenuation, InvalidAddress, InvalidAttenuation};
+
+mod blocking;
+#[doc(inline)]
+pub use blocking::*;
+
+#[cfg(feature = "async")]
+pub mod asynch;

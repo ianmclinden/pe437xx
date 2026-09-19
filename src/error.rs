@@ -1,4 +1,4 @@
-use crate::{InvalidAddress, types::InvalidAttenuation};
+use crate::{types::InvalidAttenuation, InvalidAddress};
 
 /// Errors for the Pe437xx driver
 #[derive(Debug, thiserror::Error)]

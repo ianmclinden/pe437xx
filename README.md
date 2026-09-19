@@ -14,9 +14,11 @@ Communication is currently only supported via the chip's SPI-like serial interfa
 ## Features
 
 - Blocking (synchronous) API using [`embedded-hal`] 1.0 (`SpiDevice` + `OutputPin`)
+- Async API using [`embedded-hal-async`] 1.0 
 
 ## Feature Flags
 
+- `async`: Enables async SPI support via [`embedded-hal-async`] 1.0.
 - `defmt`: Enables logging via the [`defmt`] library.
 - `serde`: Enable serialization/deserialization of the crate types with [`serde`].
 - `unchecked`: Enable `_unchecked` creation of crate types.
@@ -108,6 +110,7 @@ for inclusion in the work by you, as defined in the Apache-2.0 license, shall
 be dual licensed as above, without any additional terms or conditions.
 
 [`embedded-hal`]: https://github.com/rust-embedded/embedded-hal
+[`embedded-hal-async`]: https://github.com/rust-embedded/embedded-hal/tree/master/embedded-hal-async
 [`defmt`]: https://github.com/knurling-rs/defmt
 [`serde`]: https://github.com/serde-rs/serde
 [PE43701]: https://www.psemi.com/wp-content/uploads/pdf/obs/pe43701ds.pdf

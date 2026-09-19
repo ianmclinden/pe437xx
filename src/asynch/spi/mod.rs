@@ -1,4 +1,4 @@
-//! Drivers for `PE437xx` chips in serial configuration mode.
+//! Async drivers for `PE437xx` chips in serial configuration mode.
 //!
 //! Requires that the chip has P/S pin set to high.
 //!
@@ -16,7 +16,7 @@
 //! [examples]: https://github.com/pe437xx/pe437xx/tree/main/examples
 //!
 //! ```ignore
-//! use pe437xx::{Address, Attenuation, spi::PE43701};
+//! use pe437xx::{Address, Attenuation, async::spi::PE43701};
 //!
 //! let le = todo!("GPIO init, digital output");
 //! let spi = todo!("SPI Device init, CPOL=0, CPHA=0, 8-bit, LSB, 10 MHz clock");
@@ -26,7 +26,7 @@
 //!
 //! // Set 16.25 dB of attenuation (0.25 dB steps)
 //! let attenuation = Attenuation::from_db(16.25).unwrap();
-//! pe43701.set_attenuation(attenuation).unwrap();
+//! pe43701.set_attenuation(attenuation).await.unwrap();
 //! ```
 
 mod pe437xx;

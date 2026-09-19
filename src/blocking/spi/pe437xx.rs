@@ -1,15 +1,14 @@
 use embedded_hal::{digital::OutputPin, spi::SpiDevice};
 
-use crate::{types::Attenuation, Address, Error};
+use crate::{types::Attenuation, Error};
 
-macro_rules! impl_pe437xx_addr {
+macro_rules! impl_pe437xx_noaddr {
     ($ic:ident) => {
         #[doc = concat!(stringify!($ic),"RF Digital Step Attenuator")]
         #[derive(Debug)]
         pub struct $ic<SPI, LE> {
             spi: SPI,
             le: LE,
-            address: Address,
             attenuation: Attenuation,
         }
 
@@ -18,25 +17,22 @@ macro_rules! impl_pe437xx_addr {
             SPI: SpiDevice,
             LE: OutputPin<Error = LeError>,
         {
-            #[doc = concat!("Returns a new [`", stringify!($ic), "`] at the specified [`Address`].")]
+            #[doc = concat!("Returns a new [`", stringify!($ic), "`]")]
             ///
             /// `spi` must be configured in [`MODE_0`] (CPOL=0, CPHA=0), 8-bit words, LSB-First, and with a maximum
             /// clock frequency as specified by the datasheet (typ. 10 MHz).
             ///
             /// # Errors
             /// If the device cannot be configured due to underlying SPI or LE error.
-            pub fn new(
-                spi: SPI,
-                mut le: LE,
-                address: Address,
-            ) -> Result<Self, Error<SPI::Error, LeError>> {
+            ///
+            /// [`MODE_0`]: embedded_hal::spi::MODE_0
+            pub fn new(spi: SPI, mut le: LE) -> Result<Self, Error<SPI::Error, LeError>> {
                 // LE must be low while SPI data is shifted, take ownsership and drive low until needed
                 le.set_low().map_err(Error::Le)?;
 
                 Ok(Self {
                     spi,
                     le,
-                    address,
                     attenuation: Attenuation::MAX,
                 })
             }
@@ -51,9 +47,7 @@ macro_rules! impl_pe437xx_addr {
                 &mut self,
                 attenuation: Attenuation,
             ) -> Result<(), Error<SPI::Error, LeError>> {
-                self.spi
-                    .write(&[attenuation.steps(), self.address.into()])
-                    .map_err(Error::Spi)?;
+                self.spi.write(&[attenuation.steps()]).map_err(Error::Spi)?;
 
                 self.le.set_high().map_err(Error::Le)?;
                 self.le.set_low().map_err(Error::Le)?;
@@ -61,11 +55,6 @@ macro_rules! impl_pe437xx_addr {
                 self.attenuation = attenuation;
 
                 Ok(())
-            }
-
-            /// Get the configured device address
-            pub const fn address(&self) -> Address {
-                self.address
             }
 
             /// Get the previosly configured attenuation, or [`Attenuation::MAX`] if the device has not yet been configured
@@ -81,9 +70,5 @@ macro_rules! impl_pe437xx_addr {
     };
 }
 
-impl_pe437xx_addr!(PE43701);
-impl_pe437xx_addr!(PE43703);
-impl_pe437xx_addr!(PE43704);
-impl_pe437xx_addr!(PE43705);
-impl_pe437xx_addr!(PE43712);
-impl_pe437xx_addr!(PE43713);
+impl_pe437xx_noaddr!(PE43702);
+impl_pe437xx_noaddr!(PE43711);
