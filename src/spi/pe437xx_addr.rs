@@ -15,7 +15,7 @@ macro_rules! impl_pe437xx_addr {
 
         impl<SPI, LE, LeError> $ic<SPI, LE>
         where
-            SPI: SpiDevice<u8>,
+            SPI: SpiDevice,
             LE: OutputPin<Error = LeError>,
         {
             #[doc = concat!("Returns a new [`", stringify!($ic), "`] at the specified [`Address`].")]
