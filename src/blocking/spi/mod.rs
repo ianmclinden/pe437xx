@@ -13,20 +13,52 @@
 //! ## Examples
 //! See the [examples] directory for more complete examples.
 //!
-//! [examples]: https://github.com/pe437xx/pe437xx/tree/main/examples
+//! [examples]: https://github.com/ianmclinden/pe437xx/tree/main/examples
 //!
-//! ```ignore
+//! ```
+//! # struct MockSpi;
+//! # impl embedded_hal::spi::ErrorType for MockSpi {
+//! #     type Error = std::convert::Infallible;
+//! # }
+//! # impl embedded_hal::spi::SpiDevice for MockSpi {
+//! #     fn transaction(
+//! #         &mut self,
+//! #         _: &mut [embedded_hal::spi::Operation<'_, u8>],
+//! #     ) -> Result<(), Self::Error> {
+//! #         Ok(())
+//! #     }
+//! # }
+//! # struct MockPin;
+//! # impl embedded_hal::digital::ErrorType for MockPin {
+//! #     type Error = std::convert::Infallible;
+//! # }
+//! # impl embedded_hal::digital::OutputPin for MockPin {
+//! #     fn set_low(&mut self) -> Result<(), Self::Error> {
+//! #         Ok(())
+//! #     }
+//! #     fn set_high(&mut self) -> Result<(), Self::Error> {
+//! #         Ok(())
+//! #     }
+//! # }
+//! # let spi = MockSpi;
+//! # let le = MockPin;
 //! use pe437xx::{Address, Attenuation, spi::PE43701};
 //!
-//! let le = todo!("GPIO init, digital output");
-//! let spi = todo!("SPI Device init, CPOL=0, CPHA=0, 8-bit, LSB, 10 MHz clock");
-//!
 //! // Address configured by board layout, or other GPIO
-//! let mut pe43701 = PE43701::new(spi, le, Address::new(0x00).unwrap()).unwrap();
+//! let addr = Address::new(0x00).unwrap();
 //!
-//! // Set 16.25 dB of attenuation (0.25 dB steps)
+//! // PE437xx SPI drivers require:
+//! // - SPI mode 0 (CPOL=0, CPHA=0)
+//! // - 8-bit words
+//! // - LSB first
+//! // - Max 10 MHz clock
+//! let mut pe43701 = PE43701::new(spi, le, addr).unwrap();
+//!
 //! let attenuation = Attenuation::from_db(16.25).unwrap();
 //! pe43701.set_attenuation(attenuation).unwrap();
+//!
+//! assert_ne!(pe43701.attenuation(), Attenuation::MIN);
+//! assert_ne!(pe43701.attenuation(), Attenuation::MAX);
 //! ```
 
 mod pe437xx;

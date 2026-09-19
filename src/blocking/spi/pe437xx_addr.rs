@@ -4,7 +4,7 @@ use crate::{types::Attenuation, Address, Error};
 
 macro_rules! impl_pe437xx_addr {
     ($ic:ident) => {
-        #[doc = concat!(stringify!($ic),"RF Digital Step Attenuator")]
+        #[doc = concat!(stringify!($ic)," RF Digital Step Attenuator")]
         #[derive(Debug)]
         pub struct $ic<SPI, LE> {
             spi: SPI,

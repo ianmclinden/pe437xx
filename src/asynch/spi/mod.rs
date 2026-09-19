@@ -13,20 +13,48 @@
 //! ## Examples
 //! See the [examples] directory for more complete examples.
 //!
-//! [examples]: https://github.com/pe437xx/pe437xx/tree/main/examples
+//! [examples]: https://github.com/ianmclinden/pe437xx/tree/main/examples
 //!
-//! ```ignore
-//! use pe437xx::{Address, Attenuation, async::spi::PE43701};
+//! ```
+//! # #[tokio::main]
+//! # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # struct MockSpi;
+//! # impl embedded_hal_async::spi::ErrorType for MockSpi {
+//! #     type Error = std::convert::Infallible;
+//! # }
+//! # impl embedded_hal_async::spi::SpiDevice for MockSpi {
+//! #     async fn transaction(
+//! #         &mut self,
+//! #         _: &mut [embedded_hal::spi::Operation<'_, u8>],
+//! #     ) -> Result<(), Self::Error> {
+//! #         Ok(())
+//! #     }
+//! # }
+//! # struct MockPin;
+//! # impl embedded_hal::digital::ErrorType for MockPin {
+//! #     type Error = std::convert::Infallible;
+//! # }
+//! # impl embedded_hal::digital::OutputPin for MockPin {
+//! #     fn set_low(&mut self) -> Result<(), Self::Error> {
+//! #         Ok(())
+//! #     }
+//! #     fn set_high(&mut self) -> Result<(), Self::Error> {
+//! #         Ok(())
+//! #     }
+//! # }
+//! # let spi = MockSpi;
+//! # let le = MockPin;
+//! use pe437xx::{asynch::spi::PE43702, Attenuation};
 //!
-//! let le = todo!("GPIO init, digital output");
-//! let spi = todo!("SPI Device init, CPOL=0, CPHA=0, 8-bit, LSB, 10 MHz clock");
+//! // Some chipsets do not support addressing
+//! let mut pe43702 = PE43702::new(spi, le).unwrap();
 //!
-//! // Address configured by board layout, or other GPIO
-//! let mut pe43701 = PE43701::new(spi, le, Address::new(0x00).unwrap()).unwrap();
+//! let attenuation = Attenuation::from_steps(127).unwrap();
+//! pe43702.set_attenuation(attenuation).await.unwrap();
 //!
-//! // Set 16.25 dB of attenuation (0.25 dB steps)
-//! let attenuation = Attenuation::from_db(16.25).unwrap();
-//! pe43701.set_attenuation(attenuation).await.unwrap();
+//! assert_eq!(pe43702.attenuation(), attenuation);
+//! # Ok(())
+//! # }
 //! ```
 
 mod pe437xx;

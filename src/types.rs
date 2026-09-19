@@ -4,19 +4,45 @@
 pub struct InvalidAddress;
 
 /// A Pe437xx device address
+///
+/// Configurable on PE43701, PE43703, PE43704, PE43705, PE43712, and PE43713
+/// by tying address pins `A0`, `A1`, and `A2` high for 1, or low for 0.
+///
+/// The address pins represent the LSB of a `u8` address, so the valid addresses are in the range `0..=7`.
+///
+/// ## Address Table
+/// | A2 | A1 | A0 | Address |
+/// |:-:|:-:|:-:|------:|
+/// | L | L | L | 0b000 |
+/// | L | L | H | 0b001 |
+/// | L | H | L | 0b010 |
+/// | L | H | H | 0b011 |
+/// | H | L | L | 0b100 |
+/// | H | L | H | 0b101 |
+/// | H | H | L | 0b110 |
+/// | H | H | H | 0b111 |
+///
+/// ## Example
+/// ```
+/// use pe437xx::Address;
+///
+/// assert!(Address::new(0).is_ok());
+/// assert!(Address::new(7).is_ok());
+/// assert!(Address::new(8).is_err());
+/// ```
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Address(u8);
 
 impl Address {
     /// The minimum configurable address
-    pub const MIN_ADDR: u8 = 0;
+    const MIN_ADDR: u8 = 0;
     /// The maximum configurable address
-    pub const MAX_ADDR: u8 = 7;
+    const MAX_ADDR: u8 = 7;
 
     /// Create a new [`Address`]
     ///
     /// # Errors
-    /// If the address is outside the supported range `Self::MIN_ADDR..=Self::MAX_ADDR`
+    /// If the address is outside the supported range `0..=7`
     #[inline]
     pub const fn new(address: u8) -> Result<Self, InvalidAddress> {
         match address {
@@ -84,6 +110,16 @@ impl<'de> serde::Deserialize<'de> for Address {
 pub struct InvalidAttenuation;
 
 /// Attenuation level in decibels
+///
+/// The attenuation level is specified in quarter-decibel steps, from `0..=127` (`0.0..=31.75` dB)
+///
+/// ## Example
+/// ```
+/// use pe437xx::Attenuation;
+///
+/// assert!(Attenuation::from_db(1.0).is_ok()); // 1 dB
+/// assert!(Attenuation::from_steps(4).is_ok()); // 1 dB
+/// ```
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Attenuation {
     steps: u8,
@@ -105,6 +141,15 @@ impl Attenuation {
     ///
     /// # Errors
     /// If the number of steps is not in the range `0..=127`
+    ///
+    /// # Example
+    /// ```
+    /// use pe437xx::Attenuation;
+    ///
+    /// assert!(Attenuation::from_steps(0).is_ok());
+    /// assert!(Attenuation::from_steps(127).is_ok());
+    /// assert!(Attenuation::from_steps(128).is_err());
+    /// ```
     #[inline]
     pub const fn from_steps(steps: u8) -> Result<Self, InvalidAttenuation> {
         match steps {
@@ -116,7 +161,16 @@ impl Attenuation {
     /// Creates a new [`Attenuation`], rounding to the nearest quarter decibel.
     ///
     /// # Errors
-    /// If the supplied valie is not in the range `0.0..=31.75`
+    /// If the supplied value is not in the range `0.0..=31.75`
+    ///
+    /// # Example
+    /// ```
+    /// use pe437xx::Attenuation;
+    ///
+    /// assert!(Attenuation::from_db(0.0).is_ok());
+    /// assert!(Attenuation::from_db(31.75).is_ok());
+    /// assert!(Attenuation::from_db(32.0).is_err());
+    /// ```
     #[inline]
     pub const fn from_db(db: f32) -> Result<Self, InvalidAttenuation> {
         #[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
@@ -164,8 +218,50 @@ impl Attenuation {
     #[cfg(feature = "unchecked")]
     #[must_use]
     #[inline]
-    pub unsafe fn new_steps_unchecked(steps: u8) -> Self {
+    pub unsafe fn from_steps_unchecked(steps: u8) -> Self {
         Self { steps }
+    }
+
+    /// Create 1 dB of [`Attenuation`]
+    ///
+    /// # Example
+    /// ```
+    /// use pe437xx::Attenuation;
+    ///
+    /// assert_eq!(Attenuation::one_db(), Attenuation::from_db(1.0).unwrap());
+    /// ```
+    #[must_use]
+    #[inline]
+    pub const fn one_db() -> Self {
+        Self { steps: 4 }
+    }
+
+    /// Create 0.5 dB of [`Attenuation`]
+    ///
+    /// # Example
+    /// ```
+    /// use pe437xx::Attenuation;
+    ///
+    /// assert_eq!(Attenuation::half_db(), Attenuation::from_db(0.5).unwrap());
+    /// ```
+    #[must_use]
+    #[inline]
+    pub const fn half_db() -> Self {
+        Self { steps: 2 }
+    }
+
+    /// Create 0.25 dB of [`Attenuation`]
+    ///
+    /// # Example
+    /// ```
+    /// use pe437xx::Attenuation;
+    ///
+    /// assert_eq!(Attenuation::quarter_db(), Attenuation::from_db(0.25).unwrap());
+    /// ```
+    #[must_use]
+    #[inline]
+    pub const fn quarter_db() -> Self {
+        Self { steps: 1 }
     }
 
     /// Get this [`Attenuation`] value in decibels
@@ -221,27 +317,6 @@ impl Attenuation {
         } else {
             Self { steps }
         }
-    }
-
-    /// 1 dB of [`Attenuation`]
-    #[must_use]
-    #[inline]
-    pub const fn one_db() -> Self {
-        Self { steps: 4 }
-    }
-
-    /// 0.5 dB of [`Attenuation`]
-    #[must_use]
-    #[inline]
-    pub const fn half_db() -> Self {
-        Self { steps: 2 }
-    }
-
-    /// 0.25 dB of [`Attenuation`]
-    #[must_use]
-    #[inline]
-    pub const fn quarter_db() -> Self {
-        Self { steps: 1 }
     }
 }
 
