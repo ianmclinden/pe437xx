@@ -1,3 +1,5 @@
+#![cfg(feature = "async")]
+
 macro_rules! test_pe437xx_addr {
     ($ic:ident, $name:ident) => {
         mod $name {
@@ -134,7 +136,6 @@ macro_rules! test_pe437xx_noaddr {
     };
 }
 
-#[cfg(feature = "async")]
 mod asynch {
     test_pe437xx_addr!(PE43701, pe43701);
     test_pe437xx_addr!(PE43703, pe43703);
