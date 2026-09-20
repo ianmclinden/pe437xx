@@ -1,6 +1,6 @@
 [package]
 name = "pe437xx"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Ian McLinden <mclinden.ian@gmail.com>"]
 description = "Drivers for the PE437xx family RF Digital Step Attenuators by Peregrine Semiconductor.\nCompatible with the PE43701, PE43702, PE43703, PE43704, PE43705, PE43711, PE43712, and PE43713."
