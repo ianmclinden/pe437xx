@@ -10,6 +10,14 @@ categories = ["embedded", "hardware-support", "no-std"]
 repository = "https://github.com/ianmclinden/pe437xx"
 documentation = "https://docs.rs/pe437xx"
 license = "MIT OR Apache-2.0"
+include = [
+    "/**/*.rs",
+    "/Cargo.toml",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/LICENSE-MIT",
+    "/LICENSE-APACHE",
+]
 
 [features]
 default = []
