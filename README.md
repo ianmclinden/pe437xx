@@ -1,6 +1,6 @@
 # `pe437xx` - RF Digital Step Attenuator (DSA) Driver
 
-[![crates.io](https://img.shields.io/crates/v/pe437xx.svg)](https://crates.io/crates/pe437xx)
+[![crates.io](https://img.shields.io/crates/v/pe437xx)](https://crates.io/crates/pe437xx)
 [![Documentation](https://docs.rs/pe437xx/badge.svg)](https://docs.rs/pe437xx)
 ![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.82+-blue.svg)
 [![CI Status](https://github.com/ianmclinden/pe437xx/actions/workflows/ci.yaml/badge.svg)](https://github.com/ianmclinden/pe437xx/actions/workflows/ci.yaml)
