@@ -104,10 +104,35 @@ impl<'de> serde::Deserialize<'de> for Address {
     }
 }
 
+#[cfg(feature = "defmt")]
+impl defmt::Format for Address {
+    fn format(&self, fmt: defmt::Formatter) {
+        defmt::write!(fmt, "{}", self.0);
+    }
+}
+
 /// Invalid attenuation
 #[derive(Debug, Copy, Clone, PartialEq, Eq, thiserror::Error)]
 #[error("invalid attenuation")]
 pub struct InvalidAttenuation;
+
+#[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+pub const fn round_f32(x: f32) -> i32 {
+    let t = x as i32;
+    if x >= 0.0 {
+        if x - t as f32 >= 0.5 {
+            t + 1
+        } else {
+            t
+        }
+    } else {
+        if t as f32 - x >= 0.5 {
+            t - 1
+        } else {
+            t
+        }
+    }
+}
 
 /// Attenuation level in decibels
 ///
@@ -173,24 +198,6 @@ impl Attenuation {
     /// ```
     #[inline]
     pub const fn from_db(db: f32) -> Result<Self, InvalidAttenuation> {
-        #[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
-        pub const fn round_f32(x: f32) -> i32 {
-            let t = x as i32;
-            if x >= 0.0 {
-                if x - t as f32 >= 0.5 {
-                    t + 1
-                } else {
-                    t
-                }
-            } else {
-                if t as f32 - x >= 0.5 {
-                    t - 1
-                } else {
-                    t
-                }
-            }
-        }
-
         let db = match db {
             0.0..=31.75 => db,
             _ => return Err(InvalidAttenuation),
@@ -350,6 +357,19 @@ impl<'de> serde::Deserialize<'de> for Attenuation {
     {
         let a = u8::deserialize(deserializer)?;
         Attenuation::from_steps(a).map_err(serde::de::Error::custom)
+    }
+}
+
+#[cfg(feature = "defmt")]
+impl defmt::Format for Attenuation {
+    fn format(&self, fmt: defmt::Formatter) {
+        let db = self.db();
+        #[allow(clippy::cast_possible_truncation)]
+        let whole = db as i32;
+        #[allow(clippy::cast_precision_loss)]
+        let deci = round_f32((db - whole as f32) * 100.0).abs();
+
+        defmt::write!(fmt, "{}.{:02} dB", whole, deci);
     }
 }
 
